@@ -1,4 +1,4 @@
-//"use strict";
+"use strict";
 
 var util = require('util');
 var Q = require('q');
@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 	};
 
 	grunt.registerMultiTask(
-		'svn_bump',
+		'svn_custom_tag',
 		'Create versioned copies of specified files, placing them into a specified SVN tag folder.',
 		function () {
 			var task = this;
@@ -22,6 +22,7 @@ module.exports = function (grunt) {
 				.then(determineNextVersion)
 				.then(createVersionFolder)
 				.then(importFiles)
+				.then(copyToLatest)
 				.then(done)
 				.fail(function (error) {
 					grunt.fatal(error);
@@ -31,6 +32,7 @@ module.exports = function (grunt) {
 				var repository;
 				grunt.config.merge({
 					defaultBump: 'f',
+					noLatest:    false,
 					tagDir:      'tags'
 				});
 				grunt.config.merge(task.options());
@@ -51,10 +53,17 @@ module.exports = function (grunt) {
 					if (versions.length === 0) {
 						grunt.verbose.write('No versions found.\n');
 					} else {
-						versions = versions.split(/\/\s+/);
-						versions.pop();
+						versions = (function () {
+							var pruned = [];
+							versions.split(/\/\s+/).forEach(function (version) {
+								if (_isValid(version)) {
+									pruned.push(version);
+								}
+							});
+							return pruned;
+						})();
 						grunt.verbose.write('Found tagged versions:\n');
-						grunt.verbose.write(versions.join('\n'));
+						grunt.verbose.write(versions.join('\n'), '\n');
 					}
 					return versions;
 				});
@@ -160,7 +169,7 @@ module.exports = function (grunt) {
 					if (files.length > 0) {
 						promise.then(processFile(files.shift()));
 					} else {
-						deferred.resolve();
+						deferred.resolve(folder);
 					}
 					return promise;
 				}
@@ -174,6 +183,22 @@ module.exports = function (grunt) {
 					}
 					return performExec(command).then(processNextFile);
 				}
+			}
+
+			function copyToLatest(folder) {
+				var command;
+				var deferred;
+				var promise;
+				if (!!grunt.config('noLatest')) {
+					deferred = Q.defer();
+					deferred.resolve();
+					promise = deferred.promise;
+				} else {
+					command = sprintf('svn copy %s %s/%s/latest -m "Creating latest tag"',
+						folder, grunt.config('repository'), grunt.config('tagDir'));
+					promise = performExec(command);
+				}
+				return promise;
 			}
 
 			function performExec(command) {
@@ -203,7 +228,7 @@ module.exports = function (grunt) {
 			}
 
 			function isValidVersion(version, versions) {
-				var valid = /\d+\.\d+\.\d+/.test(version);
+				var valid = _isValid(version);
 				grunt.verbose.write('Checking version\n');
 				if (!valid) {
 					grunt.log.error('Incorrect format %s\n', version);
@@ -214,6 +239,10 @@ module.exports = function (grunt) {
 					}
 				}
 				return valid;
+			}
+
+			function _isValid(version) {
+				return /\d+\.\d+\.\d+/.test(version);
 			}
 
 			function bumpVersion(version, bump) {

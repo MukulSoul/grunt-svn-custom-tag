@@ -1,7 +1,7 @@
 {
 	"name":             "grunt-svn-custom-tag",
 	"description":      "Creates custom versioned tag entries in your SVN repository",
-	"version":          "1.0.0",
+	"version":          "1.1.0",
 	"author":           {
 		"name":  "Askelkana",
 		"email": "askelkana@gmail.com"
@@ -9,7 +9,7 @@
 	"licenses":         [
 		{
 			"type": "MIT",
-			"url":  "https://github.com/askelkana/grunt-svn-tag-dist/blob/master/LICENSE-MIT"
+			"url":  "https://github.com/askelkana/grunt-svn-custom-tag/blob/master/LICENSE-MIT"
 		}
 	],
 	"homepage":         "https://github.com/askelkana/grunt-svn-custom-tag",
@@ -32,6 +32,8 @@
 		"grunt": "~0.4.0"
 	},
 	"keywords":         [
-		"gruntplugin", "svn", "tag"
+		"gruntplugin",
+		"svn",
+		"tag"
 	]
 }

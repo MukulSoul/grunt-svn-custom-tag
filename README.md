@@ -44,6 +44,14 @@ Default: `'F'`
 
 When prompted to select the bump level, pressing enter will select the default bump.
 
+### options.noLatest
+
+Type: `boolean`
+
+Default: `false`
+
+By default, the task copies the created versioned tag to the `'latest'` tag. Setting this to false prevents this.
+
 ### options.repository
 
 Type: `String`
