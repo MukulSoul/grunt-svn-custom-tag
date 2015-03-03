@@ -1,0 +1,37 @@
+{
+	"name":             "grunt-svn-tag-dist",
+	"description":      "Creates custom versioned tag entries in your SVN repository",
+	"version":          "1.0.0",
+	"author":           {
+		"name":  "Askelkana",
+		"email": "askelkana@gmail.com"
+	},
+	"licenses":         [
+		{
+			"type": "MIT",
+			"url":  "https://github.com/askelkana/grunt-svn-tag-dist/blob/master/LICENSE-MIT"
+		}
+	],
+	"homepage":         "https://github.com/askelkana/grunt-svn-tag-dist",
+	"repository":       {
+		"type": "git",
+		"url":  "https://github.com/Askelkana/grunt-svn-tag-dist.git"
+	},
+	"bugs":             {
+		"url": "https://github.com/askelkana/grunt-svn-tag-dist/issues"
+	},
+	"engines":          {
+		"node": ">= 0.8.0"
+	},
+	"main":             "Gruntfile.js",
+	"dependencies":     {
+		"sprintf": "*",
+		"q":       "*"
+	},
+	"peerDependencies": {
+		"grunt": "~0.4.0"
+	},
+	"keywords":         [
+		"gruntplugin", "svn", "tag"
+	]
+}
