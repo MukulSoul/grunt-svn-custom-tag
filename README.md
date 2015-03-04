@@ -74,7 +74,9 @@ Various version numbering systems exist, but this plugin only supports the X.Y.Z
 
 ## Tagged Folder Structure
 
-The assumption is that all folders under the `tagDir` folder are versioned (i.e. the name is the version number). When creating a new snapshot, a new folder under the tag root will be added, and the specified files imported. See below for an example.
+The plugin processes the names of the folders under the specified `tagDir` folder and from them determines the latest (highest) version number, which will then (most likely) be bumped. Folders with names other than the X.Y.Z format are ignored. If also creating a `latest` folder, any existing folder of that name will be overwritten.
+
+When creating a new snapshot, a new folder under `tagDir` will be added, and the specified files imported. See below for an example.
 
 ## Specifying Custom Tagging
 
@@ -107,11 +109,11 @@ Note that multiple file object can be specified, and each will be processed in t
 
 ## User Input
 
-In order to determine the next bump type, the user is asked the nature of the change. Possible responses are:
+The plugin will determine the latest (highest) version number from the already existing version folders. This is the number that will be bumped (unless the user explicitly proves a version number). In order to determine the next bump type, the user is asked the nature of the change. Possible responses are:
 
-1. 'G' - A generation change, i.e. 2.1.15 => 3.0.0
-2. 'V' - A version change, i.e. 4.2.6 => 4.3.0
-3. 'F' - A fix change, i.e. 1.3.12 => 1.3.13
+1. 'G' - A generation change, e.g. 2.1.15 => 3.0.0
+2. 'V' - A version change, e.g. 4.2.6 => 4.3.0
+3. 'F' - A fix change, e.g. 1.3.12 => 1.3.13
 4. 'X' - An explicit version. The user is asked to supply the version directly. Both format clashes will be tested.
 5. 'Enter' - Use the default bump type. For convenience.
 6. 'Q' - Quit the task.
