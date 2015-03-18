@@ -15,6 +15,23 @@ One the plugin has been installed, it may be enabled inside your Gruntfile with 
 
 ## Overview
 
+In your project's Gruntfile, add a section named `svn_custom-tag` to the data object passed into `grunt.initConfig()`.
+
+	grunt.initConfig({
+		...
+		svn_custom_tag: {
+			options: {
+				// Task-specific options go here.
+			},
+			your_project: {
+				files: [
+					// the project files and folders you want tagged
+				]
+			},
+		},
+		...
+	});
+
 This plugin requires some user input to determine the right version number to use. However, this can also be circumvented by supplying arguments from the command-line (see below).
 
 ## Options
@@ -23,19 +40,17 @@ This plugin requires some user input to determine the right version number to us
 
 Type: `String`
 
-Default: `'z'`
+Default: `'F'`
 
-When prompted to select the bump level, pressing enter will select the default bump. See below for more details.
+When prompted to select the bump level, pressing enter will select the default bump.
 
-### options.latest
+### options.noLatest
 
-Type: `boolean` | `string`
+Type: `boolean`
 
-Default: `true`
+Default: `false`
 
-The plugin provides the means to copy the bumped version to a `latest` tag folder. Whether or not this is done is determined by the value of this option.
-
-Set this to `true` to copy to the latest without prompting. Set to `false` to skip this step. Set to `'prompt'` to be asked at run-time.
+By default, the task copies the created versioned tag to the `'latest'` tag. Setting this to false prevents this.
 
 ### options.repository
 
@@ -55,7 +70,7 @@ Specifies the root tag folder in the project's SVN respository.
 
 ## Version Numbering
 
-The plugin adheres to the [Semver](http://semver.org/) system of version numbering, and utilises the [semver](https://docs.npmjs.com/misc/semver) npm package to achieve this.
+Various version numbering systems exist, but this plugin only supports the X.Y.Z notation, but this should cater for the majority of cases. The terminology used in the plugin is "Generation.Version.Fix".
 
 ## Tagged Folder Structure
 
@@ -92,26 +107,25 @@ Note that multiple file object can be specified, and each will be processed in t
 
 ## User Input
 
-In order to determine the next bump type, the user is asked the nature of the change. Possible responses (all case-insensitive) are:
+In order to determine the next bump type, the user is asked the nature of the change. Possible responses are:
 
-1. 'X' - A major change, i.e. 2.1.15 => 3.0.0
-2. 'Y' - A minor change, i.e. 2.1.15 => 2.2.0
-3. 'Z' - A patch change, i.e. 2.1.15 => 2.1.16
-4. 'PX' - A premajor change, i.e. 2.1.15 => 3.0.0-0
-5. 'PY' - A preminor change, i.e. 2.1.15 => 2.2.0-0
-6. 'PZ' - A prepatch change, i.e. 2.1.15 => 2.1.16-0
-7. 'E' - An explicit version. The user is asked to supply the version directly.
-8. 'Enter' - Use the `defaultBump` option. For convenience.
-9. 'Q' - Quit the task.
+1. 'G' - A generation change, i.e. 2.1.15 => 3.0.0
+2. 'V' - A version change, i.e. 4.2.6 => 4.3.0
+3. 'F' - A fix change, i.e. 1.3.12 => 1.3.13
+4. 'X' - An explicit version. The user is asked to supply the version directly. Both format clashes will be tested.
+5. 'Enter' - Use the default bump type. For convenience.
+6. 'Q' - Quit the task.
+
+Input is case-insensitive.
 
 ### Avoiding User Input
 
 It is possible to circumvent having to supply user input by providing the bump type as the first argument for the task. For example:
 
-	> grunt svn_custom_tag:my_project:pz
+	> grunt svn_custom_tag:my_project:f
 
-In this case, only the verions bumps (1-6 above) are recognised. This feature allows for custom tasks to be defined, which can be invoked as required, e.g.
+In this case, only 'G', 'V' and 'F' are recognised. This feature allows for custom tasks to be defined, which can be invoked as required, e.g.
 
-	grunt.registerTask('tag_fix', [ 'svn_custom_tag:my_project:z' ])
+	grunt.registerTask('tag_fix', [ 'svn_custom_tag:my_project:f' ])
 
 Lovely jovely!

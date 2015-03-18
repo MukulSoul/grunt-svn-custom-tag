@@ -1,41 +1,39 @@
 {
-  "name": "grunt-svn-custom-tag",
-  "description": "Creates custom versioned tag entries in your SVN repository",
-  "version": "1.1.0",
-  "author": {
-    "name": "Askelkana",
-    "email": "askelkana@gmail.com"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/askelkana/grunt-svn-custom-tag/blob/master/LICENSE-MIT"
-    }
-  ],
-  "homepage": "https://github.com/askelkana/grunt-svn-custom-tag",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Askelkana/grunt-svn-custom-tag.git"
-  },
-  "bugs": {
-    "url": "https://github.com/askelkana/grunt-svn-custom-tag/issues"
-  },
-  "engines": {
-    "node": ">= 0.8.0"
-  },
-  "main": "Gruntfile.js",
-  "dependencies": {
-    "prompt": "^0.2.14",
-    "q": "*",
-    "semver": "^4.3.1",
-    "sprintf": "*"
-  },
-  "peerDependencies": {
-    "grunt": "~0.4.0"
-  },
-  "keywords": [
-    "gruntplugin",
-    "svn",
-    "tag"
-  ]
+	"name":             "grunt-svn-custom-tag",
+	"description":      "Creates custom versioned tag entries in your SVN repository",
+	"version":          "1.1.0",
+	"author":           {
+		"name":  "Askelkana",
+		"email": "askelkana@gmail.com"
+	},
+	"licenses":         [
+		{
+			"type": "MIT",
+			"url":  "https://github.com/askelkana/grunt-svn-custom-tag/blob/master/LICENSE-MIT"
+		}
+	],
+	"homepage":         "https://github.com/askelkana/grunt-svn-custom-tag",
+	"repository":       {
+		"type": "git",
+		"url":  "https://github.com/Askelkana/grunt-svn-custom-tag.git"
+	},
+	"bugs":             {
+		"url": "https://github.com/askelkana/grunt-svn-custom-tag/issues"
+	},
+	"engines":          {
+		"node": ">= 0.8.0"
+	},
+	"main":             "Gruntfile.js",
+	"dependencies":     {
+		"sprintf": "*",
+		"q":       "*"
+	},
+	"peerDependencies": {
+		"grunt": "~0.4.0"
+	},
+	"keywords":         [
+		"gruntplugin",
+		"svn",
+		"tag"
+	]
 }
