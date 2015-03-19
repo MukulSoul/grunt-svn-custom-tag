@@ -1,7 +1,7 @@
 {
   "name": "grunt-svn-custom-tag",
-  "description": "Creates custom versioned tag entries in your SVN repository",
-  "version": "1.2.0",
+  "description": "Tag copies of specified files, placing them into a semver'd SVN tag folder.",
+  "version": "1.2.1",
   "author": {
     "name": "Askelkana",
     "email": "askelkana@gmail.com"
@@ -25,6 +25,7 @@
   },
   "main": "Gruntfile.js",
   "dependencies": {
+    "colors": "^1.0.3",
     "prompt": "^0.2.14",
     "q": "*",
     "semver": "^4.3.1",
@@ -37,5 +38,8 @@
     "gruntplugin",
     "svn",
     "tag"
-  ]
+  ],
+  "devDependencies": {
+    "grunt-bump": "^0.3.0"
+  }
 }

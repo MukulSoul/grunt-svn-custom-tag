@@ -106,12 +106,8 @@ In order to determine the next bump type, the user is asked the nature of the ch
 
 ### Avoiding User Input
 
-It is possible to circumvent having to supply user input by providing the bump type as the first argument for the task. For example:
+It is possible to circumvent having to supply user input by providing task options from the command-line. For example:
 
-	> grunt svn_custom_tag:my_project:pz
-
-In this case, only the verions bumps (1-6 above) are recognised. This feature allows for custom tasks to be defined, which can be invoked as required, e.g.
-
-	grunt.registerTask('tag_fix', [ 'svn_custom_tag:my_project:z' ])
+	> grunt svn_custom_tag:my_project:bump=pz:latest=no
 
 Lovely jovely!
