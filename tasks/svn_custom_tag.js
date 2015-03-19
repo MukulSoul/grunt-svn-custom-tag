@@ -14,8 +14,9 @@ var util = require('util');
 colors.setTheme({
     exec:    'grey',
     info:    'cyan',
-    prompt:  'yellow',
-    verbose: 'magenta'
+    prompt:  'green',
+    verbose: 'magenta',
+    warn:    'white'
 });
 
 module.exports = function (grunt) {
@@ -42,6 +43,7 @@ module.exports = function (grunt) {
                 var defaultOptions = {
                     _debug:      false, // set to true to avoid making SVN calls
                     _colors:     false, // set to true to force colours to be enabled
+                    bump:        null,
                     defaultBump: 'z',
                     tagDir:      'tags'
                 };
@@ -117,7 +119,7 @@ module.exports = function (grunt) {
                                 description: sprintf('What do you wish to bump? [X].[Y].[Z] (or [PX].[PY].[PZ])? Or' +
                                     ' [Enter] for default (\'%s\'). Or give an [E]xplicit version. Or [Q]uit',
                                     options.defaultBump.toUpperCase()
-                                ).cyan,
+                                ).prompt,
                                 name:        'bump',
                                 pattern:     /(p?[xyz]|eq)?/i
                             }
@@ -136,6 +138,7 @@ module.exports = function (grunt) {
                 }
 
                 function processBumpChoice(bump) {
+                    var newVersion;
                     switch (bump) {
                         case 'q':
                             quit();
@@ -144,8 +147,13 @@ module.exports = function (grunt) {
                             queryForVersion();
                             break;
                         default:
-                            version = bumpVersion(version, bump);
-                            deferred.resolve(version);
+                            newVersion = bumpVersion(version, bump);
+                            if (newVersion) {
+                                confirmBump(newVersion);
+                            } else {
+                                grunt.log.warn('Unrecognised bump given. Querying for clarification.');
+                                queryForBump();
+                            }
                             break;
                     }
 
@@ -159,8 +167,8 @@ module.exports = function (grunt) {
                                 if (err !== null) {
                                     deferred.reject();
                                 }
-                                var version = input.version.toLowerCase();
-                                switch (version) {
+                                var newVersion = input.version.toLowerCase();
+                                switch (newVersion) {
                                     case 'q':
                                         quit();
                                         break;
@@ -168,16 +176,16 @@ module.exports = function (grunt) {
                                         queryForBump();
                                         break;
                                     default:
-                                        version = semver.clean(version);
-                                        if (semver.valid(version)) {
-                                            if (versions.indexOf(version) !== -1) {
-                                                grunt.log.warn('Version %s already exists.', version);
+                                        newVersion = semver.clean(newVersion);
+                                        if (semver.valid(newVersion)) {
+                                            if (versions.indexOf(newVersion) !== -1) {
+                                                grunt.log.warn('Version %s already exists.', newVersion);
                                                 queryForVersion();
                                             } else {
-                                                deferred.resolve(version);
+                                                confirmBump(newVersion);
                                             }
                                         } else {
-                                            grunt.log.error('Invalid format.');
+                                            grunt.log.warn('Invalid format.');
                                             queryForVersion();
                                         }
                                 }
@@ -194,9 +202,12 @@ module.exports = function (grunt) {
                             y:  'minor',
                             z:  'patch'
                         };
-                        version = semver.inc(version, incs[bump]);
+                        return semver.inc(version, incs[bump]);
+                    }
+
+                    function confirmBump(version) {
                         grunt.log.write('Bumping to version %s\n'.info, version);
-                        return version;
+                        deferred.resolve(version);
                     }
                 }
 
