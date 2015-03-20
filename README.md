@@ -7,11 +7,11 @@ This plugin requires Grunt `~0.4.0`
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
-	npm install grunt-svn-fetch --save-dev
+	npm install grunt-svn-custom-tag --save-dev
 
 One the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
-	grunt.loadNpmTasks('grunt-svn-fetch');
+	grunt.loadNpmTasks('grunt-svn-custom-tag');
 
 ## Overview
 
@@ -67,11 +67,11 @@ Specifies the root tag folder in the project's SVN respository.
 
 ## Tagged Folder Structure
 
-The assumption is that all folders under the `tagDir` folder are versioned (i.e. the name is the version number). When creating a new snapshot, a new folder under the tag root will be added, and the specified files imported. See below for an example.
+When creating a new snapshot, the existing tagged folders are scanned to identify the latest stored version (providing the bump starting point). Once the bump type is known, a new folder under the tag root is added, and the specified files imported. See below for an example.
 
 ## Specifying Custom Tagging
 
-The files and folders you want tagged can be specified in the normal manner, by supplying a `files` configuration object (see example above). The `src` component identifies the files from your working copy that will be imported into the tag folder. The `dest` component specifies the folder under the create version folder to which the source files/folders will be imported. For example:
+The files and folders you want tagged can be specified in the normal manner, by supplying a `files` configuration object. The `src` component identifies the files from your working copy that will be imported into the tag folder. The `dest` component specifies the folder under the create version folder to which the source files/folders will be imported. For example:
 
 	svn_custom_tag: {
 		options: {
