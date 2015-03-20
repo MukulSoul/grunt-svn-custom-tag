@@ -102,12 +102,10 @@ module.exports = function (grunt) {
                     var version;
                     if (versions.length > 0) {
                         version = versions.slice(-1)[0];
-                    }
-                    if (version) {
                         grunt.log.write('Latest version found is: %s\n'.info, version);
                     } else {
-                        grunt.log.write('Looks like you\'re creating the first build. So let\'s start from 0.0.0\n'.info);
                         version = '0.0.0';
+                        grunt.log.write('Looks like you\'re creating the first build. So let\'s start from 0.0.0\n'.info);
                     }
                     return version;
                 }
