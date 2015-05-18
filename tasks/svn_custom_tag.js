@@ -37,7 +37,7 @@ module.exports = function (grunt) {
                 .then(importFiles)
                 .then(copyToLatest)
                 .then(done)
-                .fail(fail);
+                .catch(fail);
 
             function checkOptions() {
                 var defaultOptions = {
