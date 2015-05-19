@@ -23,6 +23,14 @@ The plugin adheres to the [Semver](http://semver.org/) system of version numberi
 
 ## Options
 
+### options.bin
+
+Type: `String`
+
+Default: `'svn'`
+
+The svn binary command.
+
 ### options.bump
 
 Type: `String`
@@ -145,3 +153,8 @@ Lovely jovely!
 * Issue #1 Support for copying from SVN added: options `trunkDir` and `useWorkingCopy` provided.
 * Issue #7 corrected.
 * Issue #8 corrected.
+
+### 1.3.1
+
+* Issue #6 corrected.
+* Issue #10 implemented.
