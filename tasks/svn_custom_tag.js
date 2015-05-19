@@ -41,9 +41,10 @@ module.exports = function (grunt) {
 
 			function checkOptions() {
 				var defaultOptions = {
-					_debug:         false, // set to true to avoid making SVN calls
 					_colors:        true, // set to true to force colours to be enabled
+					_debug:         false, // set to true to avoid making SVN calls
 					bump:           null,
+					bin:            'svn',
 					defaultBump:    'z',
 					tagDir:         'tags',
 					trunkDir:       'trunk',
@@ -68,7 +69,7 @@ module.exports = function (grunt) {
 			}
 
 			function loadVersions() {
-				var command = sprintf('svn ls %s', options.fullTagDir);
+				var command = sprintf('%s ls %s', options.bin, options.fullTagDir);
 				return performExec(command).then(function (versions) {
 					versions = versions || [];
 					if (versions.length === 0) {
@@ -244,7 +245,7 @@ module.exports = function (grunt) {
 
 			function createVersionFolder(version) {
 				var folder = sprintf('%s/%s', options.fullTagDir, version);
-				var command = sprintf('svn mkdir %s -m "Creating folder for version %s"', folder, version);
+				var command = sprintf('%s mkdir %s -m "Creating folder for version %s"', options.bin, folder, version);
 				return performExec(command).thenResolve({
 					tagFolder: folder,
 					version:   version
@@ -302,7 +303,7 @@ module.exports = function (grunt) {
 				}
 
 				function importFile(file) {
-					var command = sprintf('svn import %s %s', file.src, data.tagFolder);
+					var command = sprintf('%s import %s %s', options.bin, file.src, data.tagFolder);
 					if (file.dest) {
 						command = sprintf('%s/%s', command, file.dest);
 					}
@@ -317,7 +318,8 @@ module.exports = function (grunt) {
 				}
 
 				function copyTarget(target) {
-					var command = sprintf('svn copy %s/%s %s', options.fullTrunkDir, target.src, data.tagFolder);
+					var command = sprintf('%s copy %s/%s %s',
+						options.bin, options.fullTrunkDir, target.src, data.tagFolder);
 					if (target.dest) {
 						command = sprintf('%s/%s', command, target.dest);
 					}
@@ -328,8 +330,8 @@ module.exports = function (grunt) {
 			}
 
 			function copyToLatest(data) {
-				var command;
-				var promise;
+				var deferred = Q.defer();
+				var promise = deferred.promise;
 				if (options.latest === false || /false|no/i.test(options.latest)) {
 					grunt.verbose.write('Skipping copying to latest.\n'.verbose);
 				} else if (options.latest === 'prompt') {
@@ -358,9 +360,19 @@ module.exports = function (grunt) {
 				}
 
 				function createLatest() {
-					command = sprintf('svn copy %s %s/latest -m "Creating latest tag"',
-						data.tagFolder, options.fullTagDir);
-					return performExec(command);
+					var latestDir = sprintf('%s/latest', options.fullTagDir);
+					return deleteFolder().then(createFolder);
+
+					function deleteFolder() {
+						var command = sprintf('%s delete %s -m "Deleting latest folder"', options.bin, latestDir);
+						return performExec(command);
+					}
+
+					function createFolder() {
+						var command = sprintf('%s copy %s %s -m "Creating latest folder"',
+							options.bin, data.tagFolder, latestDir);
+						return performExec(command);
+					}
 				}
 			}
 
