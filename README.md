@@ -15,7 +15,7 @@ One the plugin has been installed, it may be enabled inside your Gruntfile with 
 
 ## Overview
 
-This plugin requires some user input to determine the right version number to use. However, this can also be circumvented by supplying arguments from the command-line (see below).
+This plugin requires some user input to determine the right version number to use. However, this can also be circumvented by supplying arguments from the command-line (see below). Support for copying files from either the working copy or SVN (default) is supported.
 
 ### Version Numbering
 
@@ -55,7 +55,7 @@ Type: `String`
 
 Default: none
 
-Specifies the project's SVN repository URL. This must be specified or the task will fail.
+Specifies the project's SVN repository URL. This must be specified or the task will fail. This should be the project's root folder in the SVN, i.e. that which is common to both the source (trunk) and target (tag) folders.
 
 ### options.tagDir
 
@@ -63,7 +63,23 @@ Type: `String`
 
 Default: `'tags'`
 
-Specifies the root tag folder in the project's SVN respository.
+Specifies the root tag folder in the project's SVN repository.
+
+### options.trunkDir
+
+Type: `String`
+
+Default: `'trunk'`
+
+Specifies the source folder in the project's SVN repository. This option is utilised when copying from the SVN and not the working copy.
+
+### options.useWorkingCopy
+
+Type: `Boolean`
+
+Default: `false`
+
+If true, the specified files will be sought from the working copy. Otherwise, the files will be taken from the SVN source. This feature is useful when wishing to tag generated files, which are not typically stored in the SVN, e.g. CSS or minified Javascript files.
 
 ## Tagged Folder Structure
 
@@ -71,7 +87,7 @@ When creating a new snapshot, the existing tagged folders are scanned to identif
 
 ## Specifying Custom Tagging
 
-The files and folders you want tagged can be specified in the normal manner, by supplying a `files` configuration object. The `src` component identifies the files from your working copy that will be imported into the tag folder. The `dest` component specifies the folder under the create version folder to which the source files/folders will be imported. For example:
+The files and folders you want tagged can be specified in the normal manner, by supplying a `files` configuration object. When copying within the SVN, the `src` property identifies the files and/or folders that will be copied to the target tag folder. When using the working copy, it identifies the files from your working copy that will be imported. The `dest` component specifies the target folder under the created version folder to which the source files/folders will be imported. For example:
 
 	svn_custom_tag: {
 		options: {
@@ -121,3 +137,11 @@ It is possible to circumvent having to supply user input by specifying certain t
 Note that Command-line arguments take precedence over supplied options.
 
 Lovely jovely!
+
+## Release Notes
+
+### 1.3.0
+
+* Issue #1 Support for copying from SVN added: options `trunkDir` and `useWorkingCopy` provided.
+* Issue #7 corrected.
+* Issue #8 corrected.
