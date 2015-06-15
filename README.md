@@ -99,7 +99,7 @@ The files and folders you want tagged can be specified in the normal manner, by 
 
 	svn_custom_tag: {
 		options: {
-			respository: 'http://svn.my_company.com/my_project'
+			repository: 'http://svn.my_company.com/my_project'
 		},
 		my_project: {
 			files: [
@@ -158,3 +158,10 @@ Lovely jovely!
 
 * Issue #6 corrected.
 * Issue #10 implemented.
+
+### 1.3.2
+
+* Issue #12 corrected.
+* Issue #13 corrected.
+* Issue #14 corrected.
+* Issue #15 corrected.
