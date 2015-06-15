@@ -1,7 +1,7 @@
 {
   "name": "grunt-svn-custom-tag",
   "description": "Tag copies of specified files, placing them into a semver'd SVN tag folder.",
-  "version": "1.2.3",
+  "version": "1.3.1",
   "author": {
     "name": "Askelkana",
     "email": "askelkana@gmail.com"
