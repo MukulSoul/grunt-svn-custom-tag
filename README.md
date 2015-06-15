@@ -63,7 +63,7 @@ Type: `String`
 
 Default: `'tags'`
 
-Specifies the root tag folder in the project's SVN respository.
+Specifies the root tag folder in the project's SVN repository.
 
 ## Tagged Folder Structure
 
@@ -75,7 +75,7 @@ The files and folders you want tagged can be specified in the normal manner, by 
 
 	svn_custom_tag: {
 		options: {
-			respository: 'http://svn.my_company.com/my_project'
+			repository: 'http://svn.my_company.com/my_project'
 		},
 		my_project: {
 			files: [
