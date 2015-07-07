@@ -134,7 +134,7 @@ In order to determine the next bump type, (if not already specified via the opti
 6. `PZ` - A pre-patch change, i.e. 2.1.15 => 2.1.16-0
 7. `E` - An explicit version. The user is asked to supply the version directly.
 8. `Enter` - Use the `defaultBump` option. For convenience.
-9. 'O' - Overwrite an existing version. The user is asked to supply the version directly. To be used with caution.
+9. `O` - Overwrite an existing version. The user is asked to supply the version directly. To be used with caution.
 10. `Q` - Quit the task.
 
 ### Avoiding User Input
@@ -166,3 +166,7 @@ Lovely jovely!
 * Issue #13 corrected.
 * Issue #14 corrected.
 * Issue #15 corrected.
+
+### 1.4.0
+
+* Overwrite option supplied.
