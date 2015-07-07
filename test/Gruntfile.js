@@ -5,7 +5,8 @@ module.exports = function (grunt) {
         svn_custom_tag: {
             options: {
                 _color:     true,
-                bump:       'z',
+                //_debug:     true,
+                //bump:       'z',
                 latest:     true,
                 repository: '<%= pkg.svn.repository %>/<%= pkg.svn.project %>'
             },

@@ -33,7 +33,7 @@ module.exports = function (grunt) {
             Q.try(checkOptions)
                 .then(loadVersions)
                 .then(determineNextVersion)
-                .then(createVersionFolder)
+                .then(prepareVersionFolder)
                 .then(transferFiles)
                 .then(copyToLatest)
                 .then(done)
@@ -142,8 +142,10 @@ module.exports = function (grunt) {
                     prompt.start();
                     prompt.get([
                             {
-                                description: sprintf('What do you wish to bump? [X].[Y].[Z] (or [PX].[PY].[PZ])? Or' +
-                                                     ' [Enter] for default (\'%s\'). Or give an [E]xplicit version. Or [Q]uit',
+                                description: sprintf(
+                                    'What do you wish to bump? [X].[Y].[Z] (or [PX].[PY].[PZ])? Or' +
+                                    ' [Enter] for default (\'%s\'). Or give an [E]xplicit version. Or [O]verwrite an' +
+                                    ' existing version. Or [Q]uit.',
                                     options.defaultBump.toUpperCase()
                                 ).prompt,
                                 name:        'bump',
@@ -172,6 +174,9 @@ module.exports = function (grunt) {
                         case 'e':
                             queryForVersion();
                             break;
+                        case 'o':
+                            queryForVersion(true);
+                            break;
                         default:
                             newVersion = bumpVersion(version, bump);
                             if ( newVersion ) {
@@ -183,7 +188,7 @@ module.exports = function (grunt) {
                             break;
                     }
 
-                    function queryForVersion() {
+                    function queryForVersion(overwrite) {
                         prompt.start();
                         prompt.get({
                                 description: 'Enter version (e.g. 1.3.0-1), go [B]ack or [Q]uit'.prompt,
@@ -205,8 +210,12 @@ module.exports = function (grunt) {
                                         newVersion = semver.clean(newVersion);
                                         if ( semver.valid(newVersion) ) {
                                             if ( versions.indexOf(newVersion) !== -1 ) {
-                                                grunt.log.warn('Version %s already exists.', newVersion);
-                                                queryForVersion();
+                                                if ( !overwrite ) {
+                                                    grunt.log.warn('Version %s already exists.', newVersion);
+                                                    queryForVersion();
+                                                } else {
+                                                    confirmBump(newVersion, true);
+                                                }
                                             } else {
                                                 confirmBump(newVersion);
                                             }
@@ -231,9 +240,16 @@ module.exports = function (grunt) {
                         return semver.inc(version, incs[ bump ]);
                     }
 
-                    function confirmBump(version) {
-                        grunt.log.write('Bumping to version %s\n'.info, version);
-                        deferred.resolve(version);
+                    function confirmBump(version, exists) {
+                        if ( exists ) {
+                            grunt.log.write('Overwriting version %s\n'.info, version);
+                        } else {
+                            grunt.log.write('Bumping to version %s\n'.info, version);
+                        }
+                        deferred.resolve({
+                            exists:  !!exists,
+                            version: version
+                        });
                     }
                 }
 
@@ -243,13 +259,24 @@ module.exports = function (grunt) {
                 }
             }
 
-            function createVersionFolder(version) {
+            function prepareVersionFolder(data) {
+                var version = data.version;
+                var overwrite = data.exists;
                 var folder = sprintf('%s/%s', options.fullTagDir, version);
-                var command = sprintf('%s mkdir %s -m "Creating folder for version %s"', options.bin, folder, version);
-                return performExec(command).thenResolve({
-                    tagFolder: folder,
-                    version:   version
-                });
+                return overwrite ? deleteVersionFolder().then(createVersionFolder) : createVersionFolder();
+
+                function deleteVersionFolder() {
+                    var command = sprintf('%s delete %s -m "Removing folder"', options.bin, folder);
+                    return performExec(command);
+                }
+
+                function createVersionFolder() {
+                    var command = sprintf('%s mkdir %s -m "Creating folder for version %s"', options.bin, folder, version);
+                    return performExec(command).thenResolve({
+                        tagFolder: folder,
+                        version:   version
+                    });
+                }
             }
 
             function transferFiles(data) {
