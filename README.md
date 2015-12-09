@@ -129,13 +129,14 @@ In order to determine the next bump type, (if not already specified via the opti
 1. `X` - A major change, i.e. 2.1.15 => 3.0.0
 2. `Y` - A minor change, i.e. 2.1.15 => 2.2.0
 3. `Z` - A patch change, i.e. 2.1.15 => 2.1.16
-4. `PX` - A pre-major change, i.e. 2.1.15 => 3.0.0-0
-5. `PY` - A pre-minor change, i.e. 2.1.15 => 2.2.0-0
-6. `PZ` - A pre-patch change, i.e. 2.1.15 => 2.1.16-0
-7. `E` - An explicit version. The user is asked to supply the version directly.
-8. `Enter` - Use the `defaultBump` option. For convenience.
-9. `O` - Overwrite an existing version. The user is asked to supply the version directly. To be used with caution.
-10. `Q` - Quit the task.
+4. `PR` - A pre-release change, i.e. 2.1.15-0 => 2.1.15-1
+5. `PX` - A pre-major change, i.e. 2.1.15 => 3.0.0-0
+6. `PY` - A pre-minor change, i.e. 2.1.15 => 2.2.0-0
+7. `PZ` - A pre-patch change, i.e. 2.1.15 => 2.1.16-0
+8. `E` - An explicit version. The user is asked to supply the version directly.
+9. `Enter` - Use the `defaultBump` option. For convenience.
+10. `O` - Overwrite an existing version. The user is asked to supply the version directly. To be used with caution.
+11. `Q` - Quit the task.
 
 ### Avoiding User Input
 
@@ -170,3 +171,7 @@ Lovely jovely!
 ### 1.4.0
 
 * Overwrite option supplied.
+
+### 1.4.1
+
+* Support for pre-release added.
