@@ -4,7 +4,6 @@
 
 var colors = require('colors');
 var exec = require('child_process').exec;
-var os = require('os');
 var prompt = require('prompt');
 var Q = require('q');
 var semver = require('semver');
@@ -142,7 +141,8 @@ module.exports = function (grunt) {
 					prompt.start();
 					prompt.get([
 							{
-								description: sprintf('What do you wish to bump? [X].[Y].[Z] (or [PX].[PY].[PZ])? Or' +
+								description: sprintf('What do you wish to bump? [X].[Y].[Z] (or [PX].[PY].[PZ], or pre-release [PR])?' +
+									' Or' +
 									' [Enter] for default (\'%s\'). Or give an [E]xplicit version. Or [Q]uit',
 									options.defaultBump.toUpperCase()
 								).prompt,
@@ -224,6 +224,7 @@ module.exports = function (grunt) {
 							px: 'premajor',
 							py: 'preminor',
 							pz: 'prepatch',
+							pr: 'prerelease',
 							x:  'major',
 							y:  'minor',
 							z:  'patch'
