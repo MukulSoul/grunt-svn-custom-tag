@@ -172,6 +172,6 @@ Lovely jovely!
 
 * Overwrite option supplied.
 
-### 1.4.1
+### 1.4.2
 
 * Support for pre-release added.
