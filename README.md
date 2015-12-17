@@ -57,6 +57,16 @@ The plug-in provides the means to copy the bumped version to a `latest` tag fold
 
 Set this to `true` to copy to the latest without prompting. Set to `false` to skip this step. Set to `'prompt'` to be asked at run-time.
 
+### options.preserveStable
+
+Type `boolean`
+
+Default: `true`
+
+Works in partnership with the `latest` option. If `true`, a separate snapshot of the build will be generated to a
+`latest_stable` folder iff the version bump is either MAJOR, MINOR or PATCH. This option facilitates being able to
+maintain the latest stable build while also having unstable builds tagged.
+
 ### options.repository
 
 Type: `String`
@@ -174,4 +184,9 @@ Lovely jovely!
 
 ### 1.4.2
 
-* Support for pre-release added.
+* Support for pre-release bump added.
+
+### 1.5.0
+
+* Issue #20: Support for `preserveStable` option.
+* Issue #22: versions not sorted correctly if pre-releases present.
