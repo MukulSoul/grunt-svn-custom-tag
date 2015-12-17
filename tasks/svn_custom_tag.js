@@ -45,6 +45,8 @@ module.exports = function (grunt) {
 					bump:           null,
 					bin:            'svn',
 					defaultBump:    'z',
+					latest:         true,
+					preserveStable: true,
 					tagDir:         'tags',
 					trunkDir:       'trunk',
 					useWorkingCopy: false
@@ -88,7 +90,7 @@ module.exports = function (grunt) {
 								var aNext, bNext;
 								while (aParts.length) {
 									if (!bParts.length) {
-										rv = 1;
+										rv = -1;
 										break;
 									}
 									aNext = parseInt(aParts.shift());
@@ -102,12 +104,12 @@ module.exports = function (grunt) {
 									}
 								}
 								if (rv === undefined) {
-									rv = bParts.length > 0 ? -1 : 1;
+									rv = bParts.length > 0 ? 1 : -1;
 								}
 								return rv;
 							});
 						})();
-						grunt.verbose.write('Found tagged versions:\n'.verbose);
+						grunt.verbose.writeln('Found tagged versions:'.verbose);
 						grunt.verbose.writeln(versions.join('\n'));
 					}
 					return versions;
@@ -263,7 +265,8 @@ module.exports = function (grunt) {
 				var version = data.version;
 				var overwrite = data.exists;
 				var folder = sprintf('%s/%s', options.fullTagDir, version);
-				return overwrite ? deleteVersionFolder().then(createVersionFolder) : createVersionFolder();
+				return overwrite ? deleteVersionFolder()
+					.then(createVersionFolder, getFolderDoesntExistFail(createVersionFolder)) : createVersionFolder();
 
 				function deleteVersionFolder() {
 					var command = sprintf('%s delete %s -m "Removing folder"', options.bin, folder);
@@ -280,6 +283,7 @@ module.exports = function (grunt) {
 			}
 
 			function transferFiles(data) {
+				grunt.verbose.write('Preparing "%s" folder\n'.verbose, data.version);
 				var targets = options.useWorkingCopy ? processWorkingCopyFiles() : processRepositoryFiles();
 				var deferred = Q.defer();
 				var promise = deferred.promise;
@@ -289,19 +293,25 @@ module.exports = function (grunt) {
 				function processWorkingCopyFiles() {
 					var files = [];
 					task.files.forEach(function (file) {
-						files = files.concat(file.src.filter(function (path) {
-							var exists = grunt.file.exists(path);
-							if (!exists) {
-								grunt.log.warn('File "%s" does not exist.\n', path);
-							}
-							return exists;
-						}).map(function (path) {
-							return {
-								dest: file.dest,
-								src:  path,
-								name: path.split('/').pop()
-							};
-						}));
+						if (file.src.length === 0) {
+							grunt.log.warn('File "%s" cannot be found.'.warn, file.orig.src[0]);
+						} else {
+							files = files.concat(file.src.filter(function (path) {
+								var exists = grunt.file.exists(path);
+								if (!exists) {
+									grunt.log.warn('File "%s" does not exist.\n', path);
+								} else {
+									grunt.verbose.write('Processing file "%s"\n'.exec, path);
+								}
+								return exists;
+							}).map(function (path) {
+								return {
+									dest: file.dest,
+									src:  path,
+									name: path.split('/').pop()
+								};
+							}));
+						}
 					});
 					return files;
 				}
@@ -398,23 +408,28 @@ module.exports = function (grunt) {
 				}
 
 				function createLatest() {
-					var latestDir = sprintf('%s/latest', options.fullTagDir);
-					return deleteFolder().then(createFolder, fail);
+					return createSnapshot('latest').then(function () {
+						if (options.preserveStable && data.version.indexOf('-') === -1) {
+							return createSnapshot('latest_stable');
+						}
+					});
+				}
+
+				function createSnapshot(tag) {
+					var latestDir = sprintf('%s/%s', options.fullTagDir, tag);
+					grunt.verbose.write('Copying to "%s" folder\n'.verbose, tag);
+					return deleteFolder().then(createFolder, getFolderDoesntExistFail(createFolder));
 
 					function deleteFolder() {
-						var command = sprintf('%s delete %s -m "Deleting latest folder"', options.bin, latestDir);
+						var command = sprintf('%s delete %s -m "Deleting %s folder"', options.bin, latestDir, tag);
 						return performExec(command);
 					}
 
 					function createFolder() {
-						var command = sprintf('%s copy %s %s -m "Creating latest folder"',
-							options.bin, data.tagFolder, latestDir);
+						var command = sprintf('%s copy %s %s -m "Creating %s folder"', options.bin, data.tagFolder, latestDir, tag);
 						return performExec(command);
 					}
 
-					function fail(err) {
-						return (err.message.toLowerCase().indexOf('e160013') !== -1) ? createFolder() : err;
-					}
 				}
 			}
 
@@ -424,7 +439,7 @@ module.exports = function (grunt) {
 
 			function performExec(command) {
 				var deferred = Q.defer();
-				grunt.verbose.write('%s\n'.exec, command);
+				grunt.verbose.writeln('%s'.exec, command);
 				if (!options._debug) {
 					exec(command, function (error, stdout) {
 						if (error !== null) {
@@ -437,6 +452,12 @@ module.exports = function (grunt) {
 					deferred.resolve();
 				}
 				return deferred.promise;
+			}
+
+			function getFolderDoesntExistFail(callback) {
+				return function (err) {
+					return (err.message.toLowerCase().indexOf('e160013') !== -1) ? callback() : err;
+				}
 			}
 		}
 	);

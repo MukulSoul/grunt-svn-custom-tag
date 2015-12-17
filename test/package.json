@@ -1,15 +1,16 @@
 {
-	"name": "grunt-svn-custom-tag-test",
-	"version": "0.0.1",
-	"devDependencies": {
-		"grunt": "^0.4.0"
-	},
-	"svn": {
-		"repository": "file:///d:/svn/test_repo",
-		"project": "test_project"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Askelkana/grunt-svn-custom-tag.git"
-	}
+  "name": "grunt-svn-custom-tag-test",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "^0.4.0",
+    "grunt-svn-custom-tag": "file:../..",
+    "load-grunt-tasks": "^3.3.0"
+  },
+  "svn": {
+    "repository": "< insert test repository here >"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Askelkana/grunt-svn-custom-tag.git"
+  }
 }
