@@ -1,10 +1,10 @@
 {
-  "name": "grunt-svn-custom-tag",
+  "name": "grunt-svn-tag2",
   "description": "Tag copies of specified files, placing them into a semver'd SVN tag folder.",
-  "version": "1.5.1",
+  "version": "1.0.0",
   "author": {
-    "name": "Askelkana",
-    "email": "askelkana@gmail.com"
+    "name": "Mukul Garg",
+    "email": "mukul.garg1@gmail.com"
   },
   "licenses": [
     {
@@ -12,13 +12,13 @@
       "url": "https://github.com/askelkana/grunt-svn-custom-tag/blob/master/LICENSE-MIT"
     }
   ],
-  "homepage": "https://github.com/askelkana/grunt-svn-custom-tag",
+  "homepage": "https://github.com/MukulSoul/grunt-svn-tag2",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Askelkana/grunt-svn-custom-tag.git"
+    "url": "https://github.com/MukulSoul/grunt-svn-tag2.git"
   },
   "bugs": {
-    "url": "https://github.com/askelkana/grunt-svn-custom-tag/issues"
+    "url": "https://github.com/MukulSoul/grunt-svn-tag2/issues"
   },
   "engines": {
     "node": ">= 0.8.0"

@@ -11,11 +11,11 @@ var sprintf = require('sprintf');
 var util = require('util');
 
 colors.setTheme({
-	exec:    'grey',
-	info:    'cyan',
-	prompt:  'green',
+	exec: 'grey',
+	info: 'cyan',
+	prompt: 'green',
 	verbose: 'magenta',
-	warn:    'white'
+	warn: 'white'
 });
 
 module.exports = function (grunt) {
@@ -23,7 +23,7 @@ module.exports = function (grunt) {
 		grunt.write.log(util.inspect(obj, false, null));
 	};
 	grunt.registerMultiTask(
-		'svn_custom_tag',
+		'svn_tag2',
 		'Tag copies of specified files, placing them into a semver\'d SVN tag folder.',
 		function () {
 			var task = this;
@@ -40,22 +40,23 @@ module.exports = function (grunt) {
 
 			function checkOptions() {
 				var defaultOptions = {
-					_colors:        true, // set to true to force colours to be enabled
-					_debug:         false, // set to true to avoid making SVN calls
-					bump:           null,
-					bin:            'svn',
-					defaultBump:    'z',
-					latest:         true,
+					_colors: true, // set to true to force colours to be enabled
+					_debug: false, // set to true to avoid making SVN calls
+					bump: null,
+					bin: 'svn',
+					defaultBump: 'z',
+					latest: true,
 					preserveStable: true,
-					tagDir:         'tags',
-					trunkDir:       'trunk',
-					useWorkingCopy: false
+					tagDir: 'tags',
+					trunkDir: 'trunk',
+					useWorkingCopy: false,
+					customVersion: null,
 				};
 				options = task.options(defaultOptions);
 				task.args.forEach(function (arg) {
 					var parts = arg.split('=');
 					if (parts.length === 2) {
-						options[ parts[ 0 ] ] = parts[ 1 ];
+						options[parts[0]] = parts[1];
 					}
 				});
 				colors.enabled = colors.enabled || !!options._colors;
@@ -118,19 +119,45 @@ module.exports = function (grunt) {
 
 			function determineNextVersion(versions) {
 				var deferred = Q.defer();
-				var version = findLatestVersion();
-				if (options.bump) {
-					grunt.log.write('Bump already specified. Checking.\n'.info);
-					processBumpChoice(options.bump);
+
+				if (!options.customVersion) {
+					var version = findLatestVersion();
+					if (options.bump) {
+						grunt.log.write('Bump already specified. Checking.\n'.info);
+						processBumpChoice(options.bump);
+					} else {
+						queryForBump();
+					}
 				} else {
-					queryForBump();
+					grunt.log.write('Custom Version was specified: %s.\n'.info, options.customVersion);
+					determineCustomVersion(options.customVersion);
 				}
+
 				return deferred.promise;
+
+				function determineCustomVersion(customVersion) {
+					var newVersion = semver.clean(customVersion);
+					if (semver.valid(newVersion)) {
+						if (versions.indexOf(newVersion) !== -1) {
+							if (!overwrite) {
+								grunt.log.warn('Version %s already exists.', newVersion);
+								quit();
+							} else {
+								confirmBump(newVersion, true);
+							}
+						} else {
+							confirmBump(newVersion);
+						}
+					} else {
+						grunt.log.warn('Invalid format.');
+						quit();
+					}
+				}
 
 				function findLatestVersion() {
 					var version;
 					if (versions.length > 0) {
-						version = versions.slice(-1)[ 0 ];
+						version = versions.slice(-1)[0];
 						grunt.log.write('Latest version found is: %s\n'.info, version);
 					} else {
 						version = '0.0.0';
@@ -141,18 +168,16 @@ module.exports = function (grunt) {
 
 				function queryForBump() {
 					prompt.start();
-					prompt.get([
-							{
-								description: sprintf(
-									'What do you wish to bump? [X].[Y].[Z] (or [PX].[PY].[PZ], or pre-release [PR])?' +
-									' Or [Enter] for default (\'%s\'). Or give an [E]xplicit version.' +
-									' Or [O]verwrite an existing version. Or [Q]uit.',
-									options.defaultBump.toUpperCase()
-								).prompt,
-								name:        'bump',
-								pattern:     /(p?[xyz]|eq)?/i
-							}
-						],
+					prompt.get([{
+							description: sprintf(
+								'What do you wish to bump? [X].[Y].[Z] (or [PX].[PY].[PZ], or pre-release [PR])?' +
+								' Or [Enter] for default (\'%s\'). Or give an [E]xplicit version.' +
+								' Or [O]verwrite an existing version. Or [Q]uit.',
+								options.defaultBump.toUpperCase()
+							).prompt,
+							name: 'bump',
+							pattern: /(p?[xyz]|eq)?/i
+						}],
 						function (err, input) {
 							if (err !== null) {
 								deferred.reject();
@@ -193,7 +218,7 @@ module.exports = function (grunt) {
 						prompt.start();
 						prompt.get({
 								description: 'Enter version (e.g. 1.3.0-1), go [B]ack or [Q]uit'.prompt,
-								name:        'version'
+								name: 'version'
 							},
 							function (err, input) {
 								if (err !== null) {
@@ -235,24 +260,24 @@ module.exports = function (grunt) {
 							px: 'premajor',
 							py: 'preminor',
 							pz: 'prepatch',
-							x:  'major',
-							y:  'minor',
-							z:  'patch'
+							x: 'major',
+							y: 'minor',
+							z: 'patch'
 						};
-						return semver.inc(version, incs[ bump ]);
+						return semver.inc(version, incs[bump]);
 					}
+				}
 
-					function confirmBump(version, exists) {
-						if (exists) {
-							grunt.log.write('Overwriting version %s\n'.info, version);
-						} else {
-							grunt.log.write('Bumping to version %s\n'.info, version);
-						}
-						deferred.resolve({
-							exists:  !!exists,
-							version: version
-						});
+				function confirmBump(version, exists) {
+					if (exists) {
+						grunt.log.write('Overwriting version %s\n'.info, version);
+					} else {
+						grunt.log.write('Bumping to version %s\n'.info, version);
 					}
+					deferred.resolve({
+						exists: !!exists,
+						version: version
+					});
 				}
 
 				function quit() {
@@ -277,7 +302,7 @@ module.exports = function (grunt) {
 					var command = sprintf('%s mkdir %s -m "Creating folder for version %s"', options.bin, folder, version);
 					return performExec(command).thenResolve({
 						tagFolder: folder,
-						version:   version
+						version: version
 					});
 				}
 			}
@@ -307,7 +332,7 @@ module.exports = function (grunt) {
 							}).map(function (path) {
 								return {
 									dest: file.dest,
-									src:  path,
+									src: path,
 									name: path.split('/').pop()
 								};
 							}));
@@ -322,7 +347,7 @@ module.exports = function (grunt) {
 						file.orig.src.forEach(function (path) {
 							files.push({
 								dest: file.dest,
-								src:  path,
+								src: path,
 								name: path.split('/').pop()
 							});
 						});
@@ -393,8 +418,8 @@ module.exports = function (grunt) {
 					prompt.start();
 					prompt.get({
 							description: 'Copy to latest? [Y/n]'.prompt,
-							name:        'copy',
-							pattern:     /(y|n)?/i
+							name: 'copy',
+							pattern: /(y|n)?/i
 						},
 						function (err, input) {
 							if (err !== null) {
