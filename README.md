@@ -1,5 +1,6 @@
-# grunt-svn-custom-tag
-
+# grunt-svn-tag2
+This is a forked of [grunt-svn-custom-tag](https://www.npmjs.com/package/grunt-svn-custom-tag).
+This has the functionality to define custom version instead of looking into tag folder and bump for version.
 Creates custom versioned tag entries in your SVN repository. If you want to do a brute-force snapshot of your project i.e. put your whole project into a tag, then you probably want to use [grunt-svn-tag](https://www.npmjs.com/package/grunt-svn-tag). However, if you want to pick and choose which files from your project are tagged, then this is the plugin for you.
 
 ## Getting Started
@@ -7,11 +8,11 @@ This plugin requires Grunt `~0.4.0`
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
-	npm install grunt-svn-custom-tag --save-dev
+	npm install grunt-svn-tag2 --save-dev
 
 One the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
-	grunt.loadNpmTasks('grunt-svn-custom-tag');
+	grunt.loadNpmTasks('grunt-svn-tag2');
 
 ## Overview
 
@@ -99,6 +100,14 @@ Default: `false`
 
 If true, the specified files will be sought from the working copy. Otherwise, the files will be taken from the SVN source. This feature is useful when wishing to tag generated files, which are not typically stored in the SVN, e.g. CSS or minified Javascript files.
 
+### options.customVersion
+
+Type: `String`
+
+Default: `null`
+
+If specified, then the given version will be used as the next version for creating tag. This must be the valid version. If the specified version alread exist, then next action will depend on `options.overwrite` option.
+
 ## Tagged Folder Structure
 
 When creating a new snapshot, the existing tagged folders are scanned to identify the latest stored version (providing the bump starting point). Once the bump type is known, a new folder under the tag root is added, and the specified files imported. See below for an example.
@@ -160,33 +169,6 @@ Lovely jovely!
 
 ## Release Notes
 
-### 1.3.0
+### 1.0.0
 
-* Issue #1 Support for copying from SVN added: options `trunkDir` and `useWorkingCopy` provided.
-* Issue #7 corrected.
-* Issue #8 corrected.
-
-### 1.3.1
-
-* Issue #6 corrected.
-* Issue #10 implemented.
-
-### 1.3.2
-
-* Issue #12 corrected.
-* Issue #13 corrected.
-* Issue #14 corrected.
-* Issue #15 corrected.
-
-### 1.4.0
-
-* Overwrite option supplied.
-
-### 1.4.2
-
-* Support for pre-release bump added.
-
-### 1.5.0
-
-* Issue #20: Support for `preserveStable` option.
-* Issue #22: versions not sorted correctly if pre-releases present.
+* New Feature #1 Support for custom version: options `customVersion`  provided.
