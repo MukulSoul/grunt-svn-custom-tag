@@ -51,7 +51,7 @@ module.exports = function (grunt) {
 					trunkDir: 'trunk',
 					useWorkingCopy: false,
 					customVersion: null,
-					overwrite:false,
+					overwrite: false,
 				};
 				options = task.options(defaultOptions);
 				task.args.forEach(function (arg) {
@@ -487,4 +487,46 @@ module.exports = function (grunt) {
 			}
 		}
 	);
+
+	grunt.registerMultiTask(
+		'svnu',
+		'Update the working copy.',
+		function () {
+			var done = this.async();
+
+			var paths = this.data;
+
+			if (paths && 0 < paths.length) {
+
+				var pathLen = paths.length;
+				var taskCount = 0;
+
+				paths.forEach(function (path) {
+
+					var command = 'svn update ' + path;
+					grunt.log.write('>> Command: `%s`\n'.info, command);
+
+					Exec(command, function (error, stdout, stderr) {
+
+						grunt.log.write('\n' + stdout);
+
+						if (null !== error) {
+
+							grunt.log.error('\n'.error + error);
+						}
+
+						taskCount++;
+						if (taskCount === pathLen) {
+							grunt.log.write('All SVN update jobs are done.\n'.info);
+						}
+					});
+				});
+			} else {
+				grunt.log.write('No path to be updated.\n'.info);
+				done(true);
+			}
+		}
+	);
+
+
 };
