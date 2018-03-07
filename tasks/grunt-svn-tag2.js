@@ -51,6 +51,7 @@ module.exports = function (grunt) {
 					trunkDir: 'trunk',
 					useWorkingCopy: false,
 					customVersion: null,
+					overwrite:false,
 				};
 				options = task.options(defaultOptions);
 				task.args.forEach(function (arg) {
@@ -139,7 +140,7 @@ module.exports = function (grunt) {
 					var newVersion = semver.clean(customVersion);
 					if (semver.valid(newVersion)) {
 						if (versions.indexOf(newVersion) !== -1) {
-							if (!overwrite) {
+							if (!options.overwrite) {
 								grunt.log.warn('Version %s already exists.', newVersion);
 								quit();
 							} else {
