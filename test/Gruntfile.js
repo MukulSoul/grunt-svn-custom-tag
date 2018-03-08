@@ -2,7 +2,7 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		svn_tag2: {
+		svn_tag: {
 			options: {
 				_debug: true,
 				//bump:       'z',
@@ -34,6 +34,6 @@ module.exports = function (grunt) {
 			}
 		}
 	});
-	grunt.loadNpmTasks('grunt-svn-tag2');
-	grunt.registerTask('default', 'svn_tag2')
+	grunt.loadTasks('..\\tasks');
+	grunt.registerTask('default',[ 'svn_tag'])
 };

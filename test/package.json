@@ -1,9 +1,8 @@
 {
-  "name": "grunt-svn-tag2",
+  "name": "grunt-svn2",
   "version": "10.0.0",
   "devDependencies": {
     "grunt": "^0.4.0",
-    "grunt-svn-tag2": "file:..",
     "load-grunt-tasks": "^3.3.0"
   },
   "svn": {

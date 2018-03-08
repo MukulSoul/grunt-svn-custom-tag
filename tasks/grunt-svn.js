@@ -20,10 +20,10 @@ colors.setTheme({
 
 module.exports = function (grunt) {
 	grunt.logObject = function (obj) {
-		grunt.write.log(util.inspect(obj, false, null));
+		grunt.log.write(util.inspect(obj, false, null));
 	};
 	grunt.registerMultiTask(
-		'svn_tag2',
+		'svn_tag',
 		'Tag copies of specified files, placing them into a semver\'d SVN tag folder.',
 		function () {
 			var task = this;
@@ -73,7 +73,7 @@ module.exports = function (grunt) {
 
 			function loadVersions() {
 				var command = sprintf('%s ls %s', options.bin, options.fullTagDir);
-				return performExec(command).then(function (versions) {
+				return performExec(command, options).then(function (versions) {
 					versions = versions || [];
 					if (versions.length === 0) {
 						grunt.verbose.write('No versions found.\n'.verbose);
@@ -281,10 +281,7 @@ module.exports = function (grunt) {
 					});
 				}
 
-				function quit() {
-					grunt.log.write('Quitting\n'.info);
-					done();
-				}
+
 			}
 
 			function prepareVersionFolder(data) {
@@ -296,12 +293,12 @@ module.exports = function (grunt) {
 
 				function deleteVersionFolder() {
 					var command = sprintf('%s delete %s -m "Removing folder"', options.bin, folder);
-					return performExec(command);
+					return performExec(command, options);
 				}
 
 				function createVersionFolder() {
 					var command = sprintf('%s mkdir %s -m "Creating folder for version %s"', options.bin, folder, version);
-					return performExec(command).thenResolve({
+					return performExec(command, options).thenResolve({
 						tagFolder: folder,
 						version: version
 					});
@@ -377,7 +374,7 @@ module.exports = function (grunt) {
 						command = sprintf('%s -m "Adding folder \'%s\' to version %s"',
 							command, file.name, data.version);
 					}
-					return performExec(command).then(processNextFile, fail);
+					return performExec(command, options).then(processNextFile, fail);
 				}
 
 				function copyTarget(target) {
@@ -385,7 +382,7 @@ module.exports = function (grunt) {
 					if (target.dest) {
 						command = sprintf('%s mkdir %s/%s -m "Creating dest folder %s',
 							options.bin, data.tagFolder, target.dest, target.dest);
-						return performExec(command).then(addFile, fail);
+						return performExec(command, options).then(addFile, fail);
 					} else {
 						return addFile();
 					}
@@ -398,7 +395,7 @@ module.exports = function (grunt) {
 						}
 						command = sprintf('%s/%s', command, target.name);
 						command = sprintf('%s -m "Copying item \'%s\' to tag %s"', command, target.name, data.version);
-						return performExec(command).then(processNextFile, fail);
+						return performExec(command, options).then(processNextFile, fail);
 					}
 				}
 			}
@@ -448,37 +445,18 @@ module.exports = function (grunt) {
 
 					function deleteFolder() {
 						var command = sprintf('%s delete %s -m "Deleting %s folder"', options.bin, latestDir, tag);
-						return performExec(command);
+						return performExec(command, options);
 					}
 
 					function createFolder() {
 						var command = sprintf('%s copy %s %s -m "Creating %s folder"', options.bin, data.tagFolder, latestDir, tag);
-						return performExec(command);
+						return performExec(command, options);
 					}
 
 				}
 			}
 
-			function fail(error) {
-				grunt.fail.fatal(error.message);
-			}
 
-			function performExec(command) {
-				var deferred = Q.defer();
-				grunt.verbose.writeln('%s'.exec, command);
-				if (!options._debug) {
-					exec(command, function (error, stdout) {
-						if (error !== null) {
-							deferred.reject(error);
-						} else {
-							deferred.resolve(stdout);
-						}
-					});
-				} else {
-					deferred.resolve();
-				}
-				return deferred.promise;
-			}
 
 			function getFolderDoesntExistFail(callback) {
 				return function (err) {
@@ -488,45 +466,119 @@ module.exports = function (grunt) {
 		}
 	);
 
-	grunt.registerMultiTask(
-		'svnu',
+	grunt.registerTask(
+		'svn_update',
 		'Update the working copy.',
 		function () {
 			var done = this.async();
+			var task = this;
+			var options;
+			Q.try(checkOptions)
+				.then(svnUpdate)
+				.then(done)
+				.catch(fail);
 
-			var paths = this.data;
-
-			if (paths && 0 < paths.length) {
-
-				var pathLen = paths.length;
-				var taskCount = 0;
-
-				paths.forEach(function (path) {
-
-					var command = 'svn update ' + path;
-					grunt.log.write('>> Command: `%s`\n'.info, command);
-
-					Exec(command, function (error, stdout, stderr) {
-
-						grunt.log.write('\n' + stdout);
-
-						if (null !== error) {
-
-							grunt.log.error('\n'.error + error);
-						}
-
-						taskCount++;
-						if (taskCount === pathLen) {
-							grunt.log.write('All SVN update jobs are done.\n'.info);
-						}
-					});
+			function svnUpdate() {
+				var command = "svn update";
+				return performExec(command, options).then(function (stdout) {
+					grunt.log.write(stdout.info);
 				});
-			} else {
-				grunt.log.write('No path to be updated.\n'.info);
-				done(true);
+			}
+
+			function checkOptions() {
+				var defaultOptions = {
+					_colors: true, // set to true to force colours to be enabled
+					_debug: false, // set to true to avoid making SVN calls
+				};
+				options = task.options(defaultOptions);
+				colors.enabled = colors.enabled || !!options._colors;
 			}
 		}
 	);
+
+	grunt.registerTask(
+		'svn_info',
+		'SVN Info of working copy.',
+		function () {
+			var done = this.async();
+			var task = this;
+			var options;
+			Q.try(checkOptions)
+				.then(svnInfo)
+				.then(done)
+				.catch(fail);
+
+			function svnInfo() {
+				var command = "svn info";
+				return performExec(command, options).then(function (stdout) {
+					grunt.log.write(stdout.verbose);
+
+					var info = {};
+					stdout.split("\n").forEach(function (line) {
+						var lineParts = line.split(": ");
+						if (lineParts.length == 2) {
+							info[lineParts[0]] = lineParts[1].trim();
+						}
+					});
+					
+
+					var svnInfo = {
+						rev: info["Revision"],
+						url: info["URL"],
+						relativeUrl: info["Relative URL"],
+						workingCopyRoot: info["Working Copy Root Path"],
+						repo: {
+							root: info["Repository Root"],
+							uuid: info["Repository UUID"]
+						},
+						last: {
+							author: info["Last Changed Author"],
+							rev: info["Last Changed Rev"],
+							date: info["Last Changed Date"]
+						}
+					};
+					grunt.config.set("svnInfo", svnInfo);
+				});
+			}
+
+			function checkOptions() {
+				var defaultOptions = {
+					_colors: true, // set to true to force colours to be enabled
+					_debug: false, // set to true to avoid making SVN calls
+				};
+				options = task.options(defaultOptions);
+				colors.enabled = colors.enabled || !!options._colors;
+			}
+		}
+	);
+
+	function quit() {
+		grunt.log.write('Quitting\n'.info);
+		done();
+	}
+
+	function fail(error) {
+		grunt.fail.fatal(error.message);
+	}
+
+	function performExec(command, options) {
+		var deferred = Q.defer();
+		grunt.verbose.writeln('%s'.exec, command);
+		if (!options._debug) {
+			exec(command, function (error, stdout) {
+				if (error !== null) {
+					deferred.reject(error);
+				} else {
+					deferred.resolve(stdout);
+				}
+			});
+		} else {
+			deferred.resolve();
+		}
+		return deferred.promise;
+	}
+
+
 
 
 };
