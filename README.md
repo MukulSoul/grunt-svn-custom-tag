@@ -1,4 +1,5 @@
-# grunt-svn-tag2
+
+# grunt-svn2
 This is a forked of [grunt-svn-custom-tag](https://www.npmjs.com/package/grunt-svn-custom-tag).
 This has the functionality to define custom version instead of looking into tag folder and bump for version.
 Creates custom versioned tag entries in your SVN repository. If you want to do a brute-force snapshot of your project i.e. put your whole project into a tag, then you probably want to use [grunt-svn-tag](https://www.npmjs.com/package/grunt-svn-tag). However, if you want to pick and choose which files from your project are tagged, then this is the plugin for you.
@@ -8,11 +9,11 @@ This plugin requires Grunt `~0.4.0`
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
-	npm install grunt-svn-tag2 --save-dev
+	npm install grunt-svn2 --save-dev
 
 One the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
-	grunt.loadNpmTasks('grunt-svn-tag2');
+	grunt.loadNpmTasks('grunt-svn2');
 
 ## Overview
 
