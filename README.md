@@ -1,8 +1,15 @@
 
 # grunt-svn2
 This is a forked of [grunt-svn-custom-tag](https://www.npmjs.com/package/grunt-svn-custom-tag).
-This has the functionality to define custom version instead of looking into tag folder and bump for version.
-Creates custom versioned tag entries in your SVN repository. If you want to do a brute-force snapshot of your project i.e. put your whole project into a tag, then you probably want to use [grunt-svn-tag](https://www.npmjs.com/package/grunt-svn-tag). However, if you want to pick and choose which files from your project are tagged, then this is the plugin for you.
+
+
+It allow to 
+
+* Run SVN Update
+* Run SVN Info
+* Create SVN Tag
+
+
 
 ## Getting Started
 This plugin requires Grunt `~0.4.0`
@@ -17,9 +24,16 @@ One the plugin has been installed, it may be enabled inside your Gruntfile with 
 
 ## Overview
 
+This plugin provides 3 tasks:
+* svn_info
+* snv_update
+* svn_tag
+
+
+# Task: svn_tag 
 This plugin requires some user input to determine the right version number to use. However, this can also be circumvented by supplying arguments from the command-line (see below). Support for copying files from either the working copy or SVN (default) is supported.
 
-### Version Numbering
+## Version Numbering
 
 The plugin adheres to the [Semver](http://semver.org/) system of version numbering, and utilises the [semver](https://docs.npmjs.com/misc/semver) npm package to achieve this. For convenience, the plug-in refers to the MAJOR.MINOR.PATCH numbering as X.Y.Z (see user input below), but the same logic is followed.
 
